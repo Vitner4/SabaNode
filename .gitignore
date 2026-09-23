@@ -1,0 +1,6 @@
+# Directory
+.venv
+saba/__pycache__
+
+#Files
+microlog.log
