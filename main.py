@@ -1,5 +1,6 @@
 from saba import Manager
-from lib.MicroLog.microlog import Logger
+from saba.filesystem import *
+from saba.lib.MicroLog.microlog import Logger
 
 
 class Main:

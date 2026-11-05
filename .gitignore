@@ -1,6 +1,7 @@
 # Directory
 .venv
-saba/__pycache__
+__pycache__
+.test
 
 #Files
 microlog.log
