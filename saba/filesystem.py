@@ -1,7 +1,7 @@
 import os
 import json
-import uuid
 import shutil
+import hashlib
 
 from pathlib import Path
 from typing import Iterator
@@ -108,9 +108,16 @@ class _JSON:
 
 
 class FileIdentity:
-    # Генерация уникального ID
-    def get_id(self) -> str:
-        return str(uuid.uuid4())
+    # Генерация Hash
+    @staticmethod
+    def get_hash(path: str) -> str:
+            sha256 = hashlib.sha256()
+
+            with open(path, "rb") as file:
+                for chunk in iter(lambda: file.read(65536), b""):
+                    sha256.update(chunk)
+
+            return sha256.hexdigest()
 
 
 class Snapshot:
@@ -149,7 +156,7 @@ class _Round:
             for directory in dirs:
                 yield {
                     "path": (relative_path / directory).as_posix(),
-                    "type": "directory"
+                    "type": "directory",
                 }
 
             # Записываем найденные файлы
@@ -159,6 +166,7 @@ class _Round:
                 yield {
                     "path": file_path.relative_to(root).as_posix(),
                     "type": "file",
-                    "size": file_path.stat().st_size
-                    # TODO: добавить Hash и mtime в дальнейшем
+                    "size": file_path.stat().st_size,
+                    "mtime": file_path.stat().st_mtime,
+                    "hash": FileIdentity.get_hash(str(file_path)),
                 }

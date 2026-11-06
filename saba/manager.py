@@ -14,7 +14,7 @@ class Manager:
         # Test #
         node = {
             "name": "PC",
-            "path": "YOUR_PATH"
+            "path": "YOUR_PATH",
         }
         snapshot_path = "./snapshot_now.json"
 
