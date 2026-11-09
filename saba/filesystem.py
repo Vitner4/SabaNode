@@ -57,6 +57,10 @@ class File:
     def move(self, source: str, destination: str) -> None:
         shutil.move(source, destination)
 
+    # Замена одного файла на другой (обновление)
+    def change(self):
+        ...
+
 
 class _JSON:
     # Обычная JSON-сериализация
@@ -122,6 +126,7 @@ class FileIdentity:
 
 class Snapshot:
     def __init__(self):
+        self.sync_plan = []
         self.round = _Round()
         self.file = File()
 
@@ -141,6 +146,14 @@ class Snapshot:
             node=node,
             entries=entries
         )
+
+    # Сравнение снимков
+    def comparator(self):
+        ...
+
+    # Решение конфликтов
+    def conflictResolver(self):
+        ...
 
 
 class _Round:
@@ -170,3 +183,9 @@ class _Round:
                     "mtime": file_path.stat().st_mtime,
                     "hash": FileIdentity.get_hash(str(file_path)),
                 }
+
+
+class Sync:
+    # Синхронизация данных
+    def synchronize(self, plan):
+        ...
