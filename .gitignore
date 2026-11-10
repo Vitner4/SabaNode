@@ -1,7 +1,6 @@
 # Directory
 .venv
 __pycache__
-.test
 
 #Files
 microlog.log

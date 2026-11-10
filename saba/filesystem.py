@@ -6,6 +6,8 @@ import hashlib
 from pathlib import Path
 from typing import Iterator
 
+from saba.policy import Policy
+
 
 class File:
     def __init__(self):
@@ -57,8 +59,8 @@ class File:
     def move(self, source: str, destination: str) -> None:
         shutil.move(source, destination)
 
-    # Замена одного файла на другой (обновление)
-    def change(self):
+    # Обновление файла
+    def update(self):       
         ...
 
 
@@ -129,6 +131,7 @@ class Snapshot:
         self.sync_plan = []
         self.round = _Round()
         self.file = File()
+        self.policy = Policy().policy
 
     # Создание снимка файловой структуры
     def create(self, node: dict, path: str) -> None: 
@@ -147,9 +150,9 @@ class Snapshot:
             entries=entries
         )
 
-    # Сравнение снимков
-    def comparator(self):
-        ...
+    # Сравнение снимков и подготовка к синхронизации
+    def compare(self, snapshots: list):
+            ...
 
     # Решение конфликтов
     def conflictResolver(self):
