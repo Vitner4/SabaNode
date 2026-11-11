@@ -152,7 +152,10 @@ class Snapshot:
 
     # Сравнение снимков и подготовка к синхронизации
     def compare(self, snapshots: list):
-            ...
+            # Получение политики
+            source = self.policy["sync"]["source"]
+            destination = self.policy["sync"]["destination"]
+            actions = set(self.policy["actions"])
 
     # Решение конфликтов
     def conflictResolver(self):

@@ -45,8 +45,8 @@ class Manager:
         # ДЕЙСТВИЯ #
 
         # Создание Snapshots
-        # self.snapshot.create(node1, snapshot_path_node1)
-        # self.snapshot.create(node2, snapshot_path_node2)
+        self.snapshot.create(node1, snapshot_path_node1)
+        self.snapshot.create(node2, snapshot_path_node2)
 
         # Сравнение Snapshots
         self.snapshot.compare(snapshots)
