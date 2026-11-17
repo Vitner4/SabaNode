@@ -157,6 +157,32 @@ class Snapshot:
             destination = self.policy["sync"]["destination"]
             actions = set(self.policy["actions"])
 
+            # Списки snapshots
+            source_snapshots = []
+            destination_snapshots = []
+
+            # Получаем и распределяем snapshots
+            for snapshot in snapshots:
+                if snapshot["role"] == source:
+                    source_snapshots.append(snapshot)
+                elif snapshot["role"] == destination:
+                    destination_snapshots.append(snapshot)
+
+            # print(f"Source: {source_snapshots}")
+            # print(f"Destination: {destination_snapshots}")
+
+            # Сборка плана синхронизации
+            for src in source_snapshots:
+                for dest in destination_snapshots:
+                    src_snap = self.file.load(src["path"])
+                    dest_snap = self.file.load(dest["path"])
+
+                    print(src_snap)
+                    print(dest_snap)
+
+  
+            
+                
     # Решение конфликтов
     def conflictResolver(self):
         ...

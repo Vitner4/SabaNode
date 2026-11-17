@@ -33,11 +33,11 @@ class Manager:
         # Данные о nodes, их ролях и путях к снимкам для сравнения (имитация получения данных из project.py)
         snapshots = [
             {
-                "role": "Main",
+                "role": "main",
                 "path": snapshot_path_node1
             },
             {
-                "role": "Child",
+                "role": "child",
                 "path": snapshot_path_node2
             }
         ]
@@ -49,7 +49,7 @@ class Manager:
         self.snapshot.create(node2, snapshot_path_node2)
 
         # Сравнение Snapshots
-        self.snapshot.compare(snapshots)
+        # self.snapshot.compare(snapshots)
 
 
         

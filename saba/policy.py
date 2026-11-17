@@ -8,8 +8,8 @@ class Policy:
     def default() -> dict:
         return {
             "sync": {
-                "source": "Child",
-                "destination": "Main"
+                "source": "child",
+                "destination": "main"
             },
             "actions": [
                 "add",
