@@ -51,6 +51,8 @@ class Manager:
         # Сравнение Snapshots
         # self.snapshot.compare(snapshots)
 
+        # print(f"План: {self.snapshot.sync_plan}")
+
 
         
 

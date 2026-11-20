@@ -177,8 +177,69 @@ class Snapshot:
                     src_snap = self.file.load(src["path"])
                     dest_snap = self.file.load(dest["path"])
 
-                    print(src_snap)
-                    print(dest_snap)
+                    # print(src_snap)
+                    # print(dest_snap)
+
+                    # Собираем множество кортежей (путь, тип, размер, хэш) из снимка
+                    src_set = {
+                        (
+                            item["path"],
+                            item["type"],
+                            item.get("size"),
+                            item.get("hash"),
+                        )
+                        for item in src_snap.get("structure", [])
+                    }
+                    
+                    dest_set = {
+                        (
+                            item["path"],
+                            item["type"],
+                            item.get("size"),
+                            item.get("hash"),
+                        )
+                        for item in dest_snap.get("structure", [])
+                    }
+
+                    # Оставляем только элементы из источника, которых нет или которые отличаются в назначении
+                    diff = src_set - dest_set
+
+                    # Собираем множество всех путей из назначения для быстрой проверки наличия файла
+                    dest_paths = {entry[0] for entry in dest_set}
+
+                    # Перебираем элементы из разницы множеств
+                    for rel_path, item_type, size, file_hash in diff:
+                        # Пропускаем папку
+                        if item_type != "file":
+                            continue
+
+                        # Определяем действие
+                        if rel_path not in dest_paths:
+                            action = "add"                               
+                        else:
+                            dest_entry = dest_paths # ! проверить элементы
+
+                            _, dest_size, dest_hash = dest_entry # ! проверить элементы
+
+                            if file_hash != dest_hash or size != dest_size: # ! проверить логику сравнения
+                                action = "update"
+                            else:
+                                continue
+
+                        # Пропускаем действие, если оно не разрешено политикой
+                        if action not in actions:
+                            continue
+
+                        # Добавляем задачу в план синхронизации
+                        self.sync_plan.append({ # ! заменить на потоковую запить с файл для экономии памяти
+                            "action": action,
+                            "source": f"{src_snap['path']}/{rel_path}",
+                            "destination": f"{dest_snap['path']}/{rel_path}",                           
+                        })
+
+
+
+            
 
   
             
@@ -212,7 +273,6 @@ class _Round:
                     "path": file_path.relative_to(root).as_posix(),
                     "type": "file",
                     "size": file_path.stat().st_size,
-                    "mtime": file_path.stat().st_mtime,
                     "hash": FileIdentity.get_hash(str(file_path)),
                 }
 
