@@ -1,6 +1,9 @@
 from saba.filesystem import *
 from saba.lib.MicroLog.microlog import Logger
 
+#** Временные импорты
+from pathlib import Path
+
 
 class Manager:
     def __init__(self):
@@ -10,6 +13,7 @@ class Manager:
 
     def run(self):   
         self.log.info("Запуск программы!")
+
         # Test #
 
 
@@ -42,6 +46,9 @@ class Manager:
             }
         ]
 
+        # Путь сохранения плана синхронизации
+        plan_path = str(Path("~/.test-saba/sync_plan.json").expanduser())
+
         # ДЕЙСТВИЯ #
 
         # Создание Snapshots
@@ -49,9 +56,8 @@ class Manager:
         self.snapshot.create(node2, snapshot_path_node2)
 
         # Сравнение Snapshots
-        # self.snapshot.compare(snapshots)
+        self.snapshot.compare(snapshots, plan_path)
 
-        # print(f"План: {self.snapshot.sync_plan}")
 
 
         
