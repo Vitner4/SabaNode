@@ -50,10 +50,6 @@ class File:
           
         target = Path(path)
 
-        # Удаление старого плана
-        if target.exists():
-            target.unlink()
-
         temporary = target.with_name(target.name + ".tmp")
 
         try:
@@ -217,9 +213,6 @@ class Snapshot:
             elif snapshot["role"] == destination:
                 destination_snapshots.append(snapshot)
 
-        # print(f"Source: {source_snapshots}")
-        # print(f"Destination: {destination_snapshots}")
-
         # Добавляем задачу в план синхронизации
         self.file.save_plan( 
             path=plan_path, 
@@ -238,11 +231,8 @@ class Snapshot:
                 src_snap = self.file.load(src["path"])
                 dest_snap = self.file.load(dest["path"])
 
-                # print(src_snap)
-                # print(dest_snap)
-
                 # Собираем множество кортежей (путь, тип, размер, хэш) из снимка
-                src_set = { # ! проверить
+                src_set = { 
                     (
                         item["path"],
                         item["type"],
@@ -252,7 +242,7 @@ class Snapshot:
                     for item in src_snap.get("structure", [])
                 }
                 
-                dest_set = { # ! проверить
+                dest_set = {
                     (
                         item["path"],
                         item["type"],
@@ -263,44 +253,42 @@ class Snapshot:
                 }
 
                 # Оставляем только элементы из источника, которых нет или которые отличаются в назначении
-                diff = src_set - dest_set # ! проверить
+                diff = src_set - dest_set
 
-                # Собираем множество всех путей из назначения для быстрой проверки наличия файла
-                dest_paths = {entry[0] for entry in dest_set} # ! проверить
+                # Собираем файлы отдельно: относительный путь -> (размер, хэш)
+                dest_files = {
+                    rel_path: (item_size, item_hash)
+                    for rel_path, item_type, item_size, item_hash in dest_set
+                    if item_type == "file"
+                }
 
                 # Перебираем элементы из разницы множеств
-                for rel_path, item_type, size, file_hash in diff: # ! проверить
+                for rel_path, item_type, size, file_hash in diff:
                     # Пропускаем папку
                     if item_type != "file":
                         continue
 
-                    # Определяем действие
-                    if rel_path not in dest_paths:
-                        action = "add"                               
-                    else: # ! elif
+                    action = None
 
-                        # ! BUG: dest_paths — множество путей, а не запись файла с size и hash; распаковка падает или берёт не те данные
+                    # Явно проверяем добавление нового файла
+                    if "add" in actions and rel_path not in dest_files:
+                        action = "add"
 
-                        dest_entry = dest_paths # ! проверить элементы
-
-                        _, dest_size, dest_hash = dest_entry # ! проверить элементы
-
-                        if file_hash != dest_hash or size != dest_size: # ! проверить логику сравнения
+                    # Явно проверяем обновление существующего файла
+                    if "update" in actions and rel_path in dest_files:
+                        dest_size, dest_hash = dest_files[rel_path]
+                        if file_hash != dest_hash or size != dest_size:
                             action = "update"
-                        else:
-                            continue
 
-                    # Пропускаем действие, если оно не разрешено политикой
-                    if action not in actions:
+                    if action is None:
                         continue
 
                     yield {
-                        'action': action,
-                        'source': f"{src_snap['path']}/{rel_path}",
-                        'destination': f"{dest_snap['path']}/{rel_path}",  
+                        "action": action,
+                        "source": f"{src_snap['path']}/{rel_path.lstrip("/\\")}",
+                        "destination": f"{dest_snap['path']}/{rel_path.lstrip("/\\")}",
                     }
-                                                
-           
+                                                     
     # Решение конфликтов
     def conflictResolver(self):
         ...
